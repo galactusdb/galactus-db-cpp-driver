@@ -82,6 +82,13 @@ class Driver {
     return bytes;
   }
   void send(std::uint8_t tag, List fields = {}) {
+    if (tag == 0x10 || tag == 0x11) {
+      auto index = tag == 0x10 ? 2 : 0;
+      auto extra = fields.at(index).as<Map>();
+      auto db = extra.find("db");
+      if (db != extra.end() && db->second.as<std::string>().empty()) extra.erase(db);
+      fields.at(index) = std::move(extra);
+    }
     auto b = encode(Structure(tag, std::move(fields)));
     Bytes frame;
     for (size_t p = 0; p < b.size(); p += 65535) {
@@ -140,7 +147,7 @@ class Driver {
 
 public:
   Driver(const std::string &uri, const std::string &username,
-         const std::string &password, std::string database = "neo4j",
+         const std::string &password, std::string database = "",
          int timeout_ms = 30000)
       : database_(std::move(database)) {
 #ifdef _WIN32
