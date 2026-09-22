@@ -13,3 +13,26 @@ node_modules/
 *.suo
 .vs/
 .DS_Store
+
+# C++ / CMake / compiler and IDE output
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Testing/
+compile_commands.json
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.ipch
+.idea/
