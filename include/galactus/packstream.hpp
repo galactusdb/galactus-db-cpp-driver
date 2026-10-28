@@ -39,7 +39,9 @@ inline bool valid_utf8(const std::string &s) {
   }
   return true;
 }
-inline Bytes encode(const Value &value) {
+// Encodes a value in the wire form of the given protocol. The default keeps
+// the 0.1 behaviour (Bolt 4.4 forms); the driver passes the agreed protocol.
+inline Bytes encode(const Value &value, Protocol protocol = Protocol::Bolt44) {
   Bytes out;
   auto number = [&](std::uint64_t v, int n) {
     for (int i = n - 1; i >= 0; i--)
@@ -106,11 +108,14 @@ inline Bytes encode(const Value &value) {
               write(f.second, depth + 1);
             }
           } else if constexpr (std::is_same_v<T, std::shared_ptr<Structure>>) {
-            if (!x || x->fields.size() > 15)
+            if (!x)
               throw std::invalid_argument("Invalid structure");
-            out.push_back(static_cast<std::uint8_t>(0xb0 | x->fields.size()));
-            out.push_back(x->tag);
-            for (const auto &f : x->fields)
+            const auto fields = x->wire_fields(protocol);
+            if (fields.size() > 15)
+              throw std::invalid_argument("Invalid structure");
+            out.push_back(static_cast<std::uint8_t>(0xb0 | fields.size()));
+            out.push_back(x->wire_tag(protocol));
+            for (const auto &f : fields)
               write(f, depth + 1);
           } else if constexpr (std::is_same_v<T, std::shared_ptr<Spatial>>) {
             if (!x)
@@ -245,7 +250,9 @@ inline void validate_parameters(const Value &v, int depth = 0) {
     case 0x54:
     case 0x64:
     case 0x46:
+    case 0x49:
     case 0x66:
+    case 0x69:
     case 0x45:
     case 0x58:
     case 0x59:

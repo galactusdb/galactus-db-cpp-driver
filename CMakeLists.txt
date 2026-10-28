@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(galactus_db_cpp_driver VERSION 0.1.0 LANGUAGES CXX)
+project(galactus_db_cpp_driver VERSION 0.2.0 LANGUAGES CXX)
 add_library(galactus_db_cpp_driver INTERFACE)
 add_library(Galactus::Driver ALIAS galactus_db_cpp_driver)
 target_compile_features(galactus_db_cpp_driver INTERFACE cxx_std_17)
@@ -7,6 +7,21 @@ target_include_directories(galactus_db_cpp_driver INTERFACE ${CMAKE_CURRENT_SOUR
 if(WIN32)
   target_link_libraries(galactus_db_cpp_driver INTERFACE ws2_32)
 endif()
+
+# bolt+s:// support. Off by default so the default build has no dependencies
+# beyond the platform sockets library; without it bolt+s:// is rejected with
+# an error naming this option.
+option(GALACTUS_WITH_TLS "Enable verified bolt+s:// (SChannel on Windows, OpenSSL elsewhere)" OFF)
+if(GALACTUS_WITH_TLS)
+  target_compile_definitions(galactus_db_cpp_driver INTERFACE GALACTUS_WITH_TLS)
+  if(WIN32)
+    target_link_libraries(galactus_db_cpp_driver INTERFACE secur32 crypt32)
+  else()
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(galactus_db_cpp_driver INTERFACE OpenSSL::SSL OpenSSL::Crypto)
+  endif()
+endif()
+
 option(GALACTUS_BUILD_TESTS "Build driver tests" OFF)
 if(GALACTUS_BUILD_TESTS)
   enable_testing()
