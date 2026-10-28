@@ -12,6 +12,9 @@
 #include <vector>
 
 namespace galactus {
+// Wire form used by the encoder. Bolt 5 adds graph element ids and sends
+// offset datetimes with UTC seconds (tag I); Bolt 4.4 uses the older forms.
+enum class Protocol { Bolt44, Bolt5 };
 struct Structure;
 struct Spatial;
 struct Value;
@@ -69,6 +72,10 @@ struct Structure {
   Structure(std::uint8_t tag, List fields)
       : tag(tag), fields(std::move(fields)) {}
   virtual ~Structure() = default;
+  // Tag and fields written by the encoder for the given protocol. Plain
+  // structures are written as constructed; named values override these.
+  virtual std::uint8_t wire_tag(Protocol) const { return tag; }
+  virtual List wire_fields(Protocol) const { return fields; }
 };
 struct Spatial {
   std::string domain;
