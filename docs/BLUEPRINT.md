@@ -268,7 +268,8 @@ keeps `code` and `message` unchanged and adds, in the language's naming:
 Each driver also publishes the codes below as constants (Python module
 constants, a C# static class, Java/Go/Rust/C++ constants, a frozen Node object),
 named after the title in the language's constant style (`ErrorCodes.TypeError`
-in C#, `ErrorCodes.TYPE_ERROR` in Java, `codes.TYPE_ERROR` in Python, `galactus.CodeTypeError` in Go), so applications
+in C#, `ErrorCodes.TYPE_ERROR` in Java, `codes.TYPE_ERROR` in Python, `galactus.CodeTypeError` in Go, `codes::TYPE_ERROR` in Rust,
+`galactus::codes::type_error` in C++), so applications
 compare against a name rather than a string. Codes the server adds later still work as plain strings.
 
 | Constant | Code |
