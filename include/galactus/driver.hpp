@@ -70,13 +70,13 @@ inline constexpr const char *snapshot_too_old =
 inline constexpr const char *forbidden =
     "Galactus.ClientError.Security.Forbidden";
 inline constexpr const char *syntax_error =
-    "Neo.ClientError.Statement.SyntaxError";
+    "Galactus.ClientError.Statement.SyntaxError";
 inline constexpr const char *semantic_error =
-    "Neo.ClientError.Statement.SemanticError";
+    "Galactus.ClientError.Statement.SemanticError";
 inline constexpr const char *unauthorized =
-    "Neo.ClientError.Security.Unauthorized";
+    "Galactus.ClientError.Security.Unauthorized";
 inline constexpr const char *database_not_found =
-    "Neo.ClientError.Database.DatabaseNotFound";
+    "Galactus.ClientError.Database.DatabaseNotFound";
 } // namespace codes
 
 // A FAILURE from the server. code and what() are the server's code and
