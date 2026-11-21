@@ -2,6 +2,7 @@
 #include <fstream>
 #include <galactus/driver.hpp>
 #include <iostream>
+#include "mapper_tests.hpp"
 using namespace galactus;
 void check(bool b, const std::string &s) {
   if (!b)
@@ -366,6 +367,7 @@ void live_tests(const std::string &uri, const std::string &password) {
 int main() {
   try {
     codec_tests();
+    mapper_tests::offline();
     const char *uri = std::getenv("GDB_TEST_URI");
     if (!uri) {
       std::cout << "C++ codec passed; live skipped\n";
@@ -373,6 +375,14 @@ int main() {
     }
     const char *password = std::getenv("GDB_TEST_PASSWORD");
     live_tests(uri, password ? password : "");
+    {
+      const char *ca = std::getenv("GDB_TEST_CA_FILE");
+      DriverOptions options;
+      if (ca && *ca)
+        options.trusted_certificates = ca;
+      Driver mapped(uri, "gdb", password ? password : "", options);
+      mapper_tests::live(mapped);
+    }
     std::cout << "C++ codec and live tests passed\n";
     return 0;
   } catch (const std::exception &e) {
