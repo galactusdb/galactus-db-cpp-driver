@@ -18,8 +18,8 @@
 #endif
 
 namespace galactus {
-inline constexpr const char *driver_version = "0.2.0";
-inline constexpr const char *driver_product = "galactus-db-cpp-driver/0.2.0";
+inline constexpr const char *driver_version = "0.3.0";
+inline constexpr const char *driver_product = "galactus-db-cpp-driver/0.3.0";
 
 // Invalid URI, option or argument. Raised before any network activity.
 struct ConfigurationError : std::invalid_argument {

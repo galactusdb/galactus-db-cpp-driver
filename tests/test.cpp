@@ -179,7 +179,7 @@ void codec_tests() {
 #endif
   auto agent = bolt_agent();
   check(agent.at("product").as<std::string>() ==
-                "galactus-db-cpp-driver/0.2.0" &&
+                "galactus-db-cpp-driver/0.3.0" &&
             agent.at("language").as<std::string>().rfind("C++/", 0) == 0,
         "bolt_agent");
 }

@@ -9,7 +9,7 @@ build has **zero third-party dependencies**: it needs only the platform's
 socket library. Turn on one CMake option and it connects over verified TLS
 using the operating system's own TLS stack.
 
-**Status: 0.2 / early access.** Source is available on `main`. Each driver owns
+**Status: 0.3 / early access.** Source is available on `main`. Each driver owns
 one connection and returns complete results. Install from source as shown below
 and read the [scope notes](docs/OVERVIEW.md#scope) before you build on it.
 
@@ -25,7 +25,7 @@ and read the [scope notes](docs/OVERVIEW.md#scope) before you build on it.
 - [Spatial values](#spatial-values)
 - [Errors and connection lifecycle](#errors-and-connection-lifecycle)
 - [Testing](#testing)
-- [What 0.2 includes](#what-02-includes)
+- [What 0.3 includes](#what-03-includes)
 
 ## Quickstart
 
@@ -405,12 +405,12 @@ settings and environment examples. The shared live suite covers Bolt 5.4,
 Bolt 4.4 and TLS, 57 spatial cases, integer boundaries, native values, large
 chunked payloads, transactions, recovery after errors and constraint codes.
 
-## What 0.2 includes
+## What 0.3 includes
 
 Direct `bolt://` and verified `bolt+s://` connections, Bolt 5.4 with a 4.4
 fallback, basic authentication, parameterised queries, complete results with
 summaries and bookmarks, explicit transactions, recovery after database
-errors, classified errors with published code constants, native type mapping
+errors, classified errors with published code constants, native type mapping, an object mapper
 and full spatial interchange. Messages are capped at 64 MiB and nesting at 64
 levels.
 
