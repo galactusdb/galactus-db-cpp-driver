@@ -9,7 +9,7 @@ build has **zero third-party dependencies**: it needs only the platform's
 socket library. Turn on one CMake option and it connects over verified TLS
 using the operating system's own TLS stack.
 
-**Status: 0.2 / early access.** Source is available on `main`. Each driver owns
+**Status: 0.3 / early access.** Source is available on `main`. Each driver owns
 one connection and returns complete results. Install from source as shown below
 and read the [scope notes](docs/OVERVIEW.md#scope) before you build on it.
 
@@ -21,10 +21,11 @@ and read the [scope notes](docs/OVERVIEW.md#scope) before you build on it.
 - [Queries and results](#queries-and-results)
 - [Transactions](#transactions)
 - [Native type mapping](#native-type-mapping)
+- [Object mapping](#object-mapping)
 - [Spatial values](#spatial-values)
 - [Errors and connection lifecycle](#errors-and-connection-lifecycle)
 - [Testing](#testing)
-- [What 0.2 includes](#what-02-includes)
+- [What 0.3 includes](#what-03-includes)
 
 ## Quickstart
 
@@ -240,9 +241,60 @@ Unix-epoch clocks.
 - Unknown wire structures remain explicit structures and cannot be used as
   generic application-object serialization.
 
-No ORM or automatic arbitrary-object mapping is included. Convert application
+The optional [mapper](#object-mapping) converts your own types to and from nodes. Convert application
 models and UUIDs explicitly to a supported value. See the
 [complete type mapping](docs/BLUEPRINT.md) for precision and range details.
+
+## Object mapping
+
+The driver includes an optional mapper: declare a type as a node or a relationship, and it
+converts objects to and from the graph and writes the Cypher for the everyday operations.
+It adds no dependency. [docs/MAPPER.md](docs/MAPPER.md) is the full contract, shared by every
+Galactus driver.
+
+```cpp
+#include <galactus/mapper.hpp>
+
+struct Person {
+  std::int64_t id{};
+  std::string name;
+  std::optional<std::string> email;
+};
+struct Company { std::string name; };
+struct WorksAt { std::int64_t since{}; };
+
+template <> struct galactus::Mapped<Person> {
+  static auto describe() {
+    return galactus::node<Person>("Person")
+        .key("id", &Person::id)
+        .property("name", &Person::name)
+        .property("email_address", &Person::email);
+  }
+};
+template <> struct galactus::Mapped<Company> {
+  static auto describe() { return galactus::node<Company>("Company").key("name", &Company::name); }
+};
+template <> struct galactus::Mapped<WorksAt> {
+  static auto describe() { return galactus::relationship<WorksAt>("WORKS_AT").property("since", &WorksAt::since); }
+};
+
+galactus::Mapper mapper(driver);
+Person ann = mapper.save(Person{1, "Ann", {}});
+Company acme = mapper.save(Company{"Acme"});
+mapper.relate(ann, WorksAt{2024}, acme);
+
+std::optional<Person> found = mapper.find<Person>(1);
+std::vector<Person> people = mapper.find_all<Person>(galactus::Map{{"name", "Ann"}}, 10);
+auto jobs = mapper.related<WorksAt, Company>(ann);     // std::vector<std::pair<WorksAt, Company>>
+auto named = mapper.query<Person>("MATCH (p:Person) WHERE p.name STARTS WITH $s RETURN p",
+                                  galactus::Map{{"s", "A"}});
+bool deleted = mapper.remove<Person>(1);
+```
+
+`mapper.hpp` is a header of its own; including `driver.hpp` alone is unchanged. A filter is keyed by property name, and `remove` is the mapper's delete.
+`query` maps what a statement of your own returns, so the mapper never stands between you
+and Cypher. Every operation is one statement and joins the driver's open transaction when
+there is one.
 
 ## Spatial values
 
@@ -353,12 +405,12 @@ settings and environment examples. The shared live suite covers Bolt 5.4,
 Bolt 4.4 and TLS, 57 spatial cases, integer boundaries, native values, large
 chunked payloads, transactions, recovery after errors and constraint codes.
 
-## What 0.2 includes
+## What 0.3 includes
 
 Direct `bolt://` and verified `bolt+s://` connections, Bolt 5.4 with a 4.4
 fallback, basic authentication, parameterised queries, complete results with
 summaries and bookmarks, explicit transactions, recovery after database
-errors, classified errors with published code constants, native type mapping
+errors, classified errors with published code constants, native type mapping, an object mapper
 and full spatial interchange. Messages are capped at 64 MiB and nesting at 64
 levels.
 

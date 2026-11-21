@@ -1,7 +1,7 @@
 # Galactus DB drivers
 
 Seven native **database drivers**, with a shared API and zero third-party runtime
-packages in their default builds. Version **0.2.0** is early access. All seven
+packages in their default builds. Version **0.3.0** is early access. All seven
 source repositories are public under [galactusdb](https://github.com/galactusdb),
 with `main` as the default branch. Registry packages have not been published;
 install from source using the language Quickstart and pin a reviewed commit.
@@ -137,10 +137,14 @@ owned by each driver. Use a separate driver for each concurrent unit of work,
 especially transactions. Go, Java and C# serialize calls; Node rejects overlapping
 operations; Python and C++ must not be shared concurrently; Rust requires mutable
 access. There is no connection pool, routing discovery, automatic retry,
-managed transaction callback, lazy cursor, ORM, or async API outside Node yet.
+managed transaction callback, lazy cursor, or async API outside Node yet.
 Drivers do not send bookmarks, re-authenticate sessions, send telemetry or
 route. Speaking Bolt 5 does not imply cluster routing or full compatibility
 with other Bolt drivers, and the drivers are not yet declared production ready.
+
+Each driver carries an optional object mapper: declare a type as a node or a
+relationship and it converts objects to and from the graph. [The mapper
+contract](MAPPER.md) is the same in every language.
 
 Messages are limited to 64 MiB and nesting to 64 levels. Query results are eager
 and may collectively exceed one message; use Cypher `LIMIT` for large queries.

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(galactus_db_cpp_driver VERSION 0.2.0 LANGUAGES CXX)
+project(galactus_db_cpp_driver VERSION 0.3.0 LANGUAGES CXX)
 add_library(galactus_db_cpp_driver INTERFACE)
 add_library(Galactus::Driver ALIAS galactus_db_cpp_driver)
 target_compile_features(galactus_db_cpp_driver INTERFACE cxx_std_17)
